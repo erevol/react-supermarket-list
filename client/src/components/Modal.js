@@ -9,22 +9,36 @@ class Modal extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.onEscKeyPressed = this.onEscKeyPressed.bind(this);
+    this.onEnterKeyPressed = this.onEnterKeyPressed.bind(this);
   }
 
-  componentDidMount(){
+  componentDidMount() {
     document.addEventListener("keydown", this.onEscKeyPressed, false);
   }
-  componentWillUnmount(){
+  componentWillUnmount() {
     document.removeEventListener("keydown", this.onEscKeyPressed, false);
   }
 
   handleChange(e) {
-    this.setState({ value: e.target.value })
+    this.setState({ value: e.target.value });
   }
 
-  onEscKeyPressed(e){
-    if(e.keyCode === 27) {
+  onEscKeyPressed(e) {
+    if (e.keyCode === 27) {
       this.props.handleCancel();
+    }
+  }
+
+  onEnterKeyPressed = (e) => {
+    if (e.which === 13) {
+      this.props.handleAdd(this.state.value);
+    }
+  }
+
+  handleAdd(description) {
+    if (description.length > 0) {
+      this.props.handleAdd(description);
+      this.setState({ value: '' });
     }
   }
 
@@ -34,12 +48,10 @@ class Modal extends Component {
         <div className="modal_inner">
           <h1 className="app-title">Add item</h1>
           <div className="modal-container">
-            {/* <div classname="modal-input"> */}
-            <input autoFocus onChange={this.handleChange} type="text" value={this.state.value} />
-            {/* </div> */}
+            <input autoFocus onKeyPress={this.onEnterKeyPressed} onChange={this.handleChange} type="text" value={this.state.value} />
             <div className="modal-btn-container">
               <button onClick={this.props.handleCancel} className="modal-btn-cancel" type="submit">Cancel</button>
-              <button onClick={() => this.props.handleAdd(this.state.value)} className="modal-btn-add" disabled={!this.state.value} type="submit">Add</button>
+              <button onClick={() => this.handleAdd(this.state.value)} className="modal-btn-add" disabled={!this.state.value} type="submit">Add</button>
             </div>
           </div>
         </div>

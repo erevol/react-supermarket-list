@@ -6,7 +6,7 @@ class Header extends Component {
     return (
       <div className="app-title">
         <h1>{this.props.title}</h1>
-        <ItemsCount />
+        <ItemsCount itemsCount={this.props.itemsCount} />
       </div>
     );
   }

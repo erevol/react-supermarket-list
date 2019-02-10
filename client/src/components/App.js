@@ -3,6 +3,7 @@ import '../css/App.css';
 import Header from './Header';
 import Modal from './Modal';
 import RowItem from './RowItem';
+import api from '../api/api';
 
 class App extends Component {
   constructor(props) {
@@ -10,12 +11,8 @@ class App extends Component {
 
     this.state = {
       showModal: false,
-      items: [
-        { id: 0, description: "Beer" },
-        { id: 1, description: "Cofee" },
-        { id: 2, description: "More Beer" }
-      ],
-      nextId: 3
+      items: [],
+      nextId: 0
     }
 
     this.addItem = this.addItem.bind(this);
@@ -23,20 +20,43 @@ class App extends Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
+  componentDidMount() {
+    if (localStorage.hasOwnProperty('items')) {
+      this.hydrateStateWithLocalStorage();
+    }
+  }
+
+  hydrateStateWithLocalStorage() {
+    let items = localStorage.getItem('items');
+
+    try {
+      items = JSON.parse(items);
+      this.setState({ items });
+    } catch (e) {
+      this.setState({ items });
+    }
+  }
+
   addItem(description) {
-    let items = this.state.items.slice();
     let nextId = this.state.nextId + 1;
-    items.push({ id: this.state.nextId, description });
+    let items = [...this.state.items, {
+      id: nextId,
+      description
+    }];
     this.setState({
       items,
-      nextId
-    })
+      nextId,
+      showModal: !this.state.showModal
+    });
+    localStorage.setItem("items", JSON.stringify(items));
   }
 
   removeItem(id) {
+    const updatedItems = this.state.items.filter(item => item.id !== id);
     this.setState({
-      items: this.state.items.filter(item => item.id !== id)
+      items: updatedItems
     });
+    localStorage.setItem("items", JSON.stringify(updatedItems));
   }
 
   handleClick() {
@@ -48,14 +68,15 @@ class App extends Component {
   render() {
     return (
       <div className="container">
-        <Header title="Supermarket List" />
+        <Header title="Supermarket List" itemsCount={this.state.items.length} />
         <div className="flex-container">
           <div className="container">
             {this.state.items.map(item =>
               <RowItem
                 description={item.description}
                 id={item.id}
-                key={item.id}
+                key={item.description}
+                handleDelete={this.removeItem}
               />
             )}
           </div>

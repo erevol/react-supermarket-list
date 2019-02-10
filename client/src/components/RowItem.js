@@ -11,7 +11,7 @@ class RowItem extends Component {
   }
 
   handleDelete (id) {
-    console.log('deleted: ' + id);
+    this.props.handleDelete(id);
   }
 
   render() {

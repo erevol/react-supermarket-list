@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 class ItemsCount extends Component {
   render() {
     return (
-      <div className="app-subtitle">3 ITEMS</div>
+      <div className="app-subtitle">{this.props.itemsCount} ITEMS</div>
     );
   }
 }
