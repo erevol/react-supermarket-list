@@ -5,77 +5,99 @@ import Modal from './Modal';
 import RowItem from './RowItem';
 
 class App extends Component {
-  constructor(props) {
-    super(props)
+    constructor(props) {
+        super(props)
 
-    this.state = {
-      showModal: false,
-      items: [
-        { id: 0, description: "Beer" },
-        { id: 1, description: "Cofee" },
-        { id: 2, description: "More Beer" }
-      ],
-      nextId: 3
+        this.state = {
+            showModal: false,
+            items: [],
+            nextId: 3
+        }
+
+        this.addItem = this.addItem.bind(this);
+        this.removeItem = this.removeItem.bind(this);
+        this.handleClick = this.handleClick.bind(this);
     }
 
-    this.addItem = this.addItem.bind(this);
-    this.removeItem = this.removeItem.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-  }
+    componentDidMount() {
+        if (localStorage.hasOwnProperty('items')) {
+            this.hydrateStateWithLocalStorage();
+        }
+    }
 
-  addItem(description) {
-    let items = this.state.items.slice();
-    let nextId = this.state.nextId + 1;
-    items.push({ id: this.state.nextId, description });
-    this.setState({
-      items,
-      nextId
-    })
-  }
+    hydrateStateWithLocalStorage() {
+        let items = localStorage.getItem('items');
 
-  removeItem(id) {
-    this.setState({
-      items: this.state.items.filter(item => item.id !== id)
-    });
-  }
+        try {
+            items = JSON.parse(items);
+            this.setState({ items });
+        } catch (e) {
+            this.setState({ items });
+        }
+    }
 
-  handleClick() {
-    this.setState({
-      showModal: !this.state.showModal
-    });
-  }
+    addItem(description) {
+        let nextId = this.state.nextId + 1;
+        let items = [...this.state.items, {
+            id: nextId,
+            description
+        }];
+        this.setState({
+            items,
+            nextId,
+            showModal: !this.state.showModal
+        });
+        localStorage.setItem("items", JSON.stringify(items));
+    }
 
-  render() {
-    return (
-      <div className="container">
-        <Header title="Supermarket List" />
-        <div className="flex-container">
-          <div className="container">
-            {this.state.items.map(item =>
-              <RowItem
-                description={item.description}
-                id={item.id}
-                key={item.id}
-              />
-            )}
-          </div>
-        </div>
-        <div className="flex-container">
-          <button onClick={this.handleClick} className="add-btn" type="submit">Add item</button>
-        </div>
-        <div>
-          {this.state.showModal ?
-            <Modal
-              description=""
-              handleCancel={this.handleClick}
-              handleAdd={this.addItem}
-            />
-            : null
-          }
-        </div>
-      </div>
-    );
-  }
+    removeItem(id) {
+        const updatedItems = this.state.items.filter(item => item.id !== id);
+        this.setState({
+            items: updatedItems
+        });
+        localStorage.setItem("items", JSON.stringify(updatedItems));
+    }
+
+    handleClick() {
+        this.setState({
+            showModal: !this.state.showModal
+        });
+    }
+
+    render() {
+        return (
+            <div className="container">
+                <Header title="Supermarket List" itemsCount={this.state.items.length} />
+                <div className="flex-container">
+                    <div className="container">
+                        {this.state.items.length === 0 ?
+                            <div className="app-subtitle-empty-list">List is empty</div> :
+                            this.state.items.map(item =>
+                                <RowItem
+                                    description={item.description}
+                                    id={item.id}
+                                    key={item.description}
+                                    handleDelete={this.removeItem}
+                                />
+                        )}
+                    </div>
+                </div>
+                <div className="flex-container">
+                    <button onClick={this.handleClick} className="add-btn" type="submit">Add item</button>
+                </div>
+                <div>
+                    {this.state.showModal ?
+                        <Modal
+                            description=""
+                            handleCancel={this.handleClick}
+                            handleAdd={this.addItem}
+                        />
+                        : null
+                    }
+                </div>
+            </div>
+        );
+    }
 }
 
 export default App;

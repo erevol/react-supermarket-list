@@ -11,6 +11,11 @@
   margin-top: -20px;
   color: #636e72;
 }
+.app-subtitle-empty-list {
+    color: #636e72;
+    text-align: center;
+    margin-bottom: 50px;
+  }
 .flex-container {
   display: flex;
   justify-content: center;

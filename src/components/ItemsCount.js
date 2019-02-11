@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 
 class ItemsCount extends Component {
-  render() {
-    return (
-      <div className="app-subtitle">3 ITEMS</div>
-    );
-  }
+    render() {
+        return (
+            this.props.itemsCount ?
+                <div className="app-subtitle">{this.props.itemsCount} ITEMS</div>
+            : null
+        );
+    }
 }
 
 export default ItemsCount;
